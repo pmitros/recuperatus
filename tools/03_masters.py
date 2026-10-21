@@ -19,7 +19,8 @@ from skimage.registration import phase_cross_correlation
 N = 600                 # instances per label
 MIN_CONF = 90
 MIN_COHERENCE = 0.9
-PITCH = (17.5, 18.6)    # only lines of this typewriter pitch (10 cpi at 180 ppi)
+PITCH = tuple(map(float, os.environ.get('PITCH', '17.5,18.6').split(',')))   # lines of this typewriter pitch (10 cpi at 180 ppi by default)
+OUT = os.environ.get('MASTERS', 'work/masters')   # writes OUT.npz, OUT.json, OUT.png
 UP = 4                  # super-resolution factor
 # cell window in pitch units, relative to (cell centre, baseline)
 U0, U1 = -0.75, 0.75
@@ -61,7 +62,7 @@ def main():
     # 2. sample cells page by page
     crops = defaultdict(list)
     for pg, items in sorted(chosen.items()):
-        im = ink(f'pages/{pg}.png')
+        im = ink(f"{os.environ.get('PAGES_DIR', 'pages')}/{pg}.png")
         for lab, cx, base, pitch in items:
             dy, dx = grid_coords(pitch)
             crops[lab].append(ndimage.map_coordinates(im, [base + dy, cx + dx], order=3, mode='constant'))
@@ -79,8 +80,8 @@ def main():
         masters[lab] = ref
         stats[lab] = dict(n=len(cs), total=len(by_label[lab]), corr_median=float(np.median(r)),
                           corr_p10=float(np.percentile(r, 10)))
-    np.savez_compressed('work/masters.npz', **{f'u{ord(k):04x}': v for k, v in masters.items()})
-    json.dump(stats, open('work/masters.json', 'w'), indent=1)
+    np.savez_compressed(OUT + '.npz', **{f'u{ord(k):04x}': v for k, v in masters.items()})
+    json.dump(stats, open(OUT + '.json', 'w'), indent=1)
 
     # 4. contact sheet
     labs = sorted(masters, key=lambda k: -stats[k]['total'])
@@ -91,7 +92,7 @@ def main():
         x, y = (i % cols) * (w + 8), (i // cols) * (h + 24)
         sheet.paste(Image.fromarray((255 * (1 - np.clip(masters[lab], 0, 1))).astype(np.uint8)), (x, y + 20))
         d.text((x + 2, y + 2), f'{lab} {stats[lab]["total"]}', fill=0)
-    sheet.save('work/masters.png')
+    sheet.save(OUT + '.png')
     print('masters:', len(masters))
 
 

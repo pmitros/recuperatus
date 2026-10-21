@@ -8,7 +8,7 @@
 import glob, os, subprocess
 import fontforge
 
-raw = sorted(glob.glob('work/font/*-raw.otf'))[-1]
+raw = os.environ.get('RAW') or sorted(glob.glob('work/font/*-raw.otf'))[-1]
 f = fontforge.open(raw)
 f.selection.all()
 f.simplify(0.4, ('mergelines', 'smoothcurves', 'removesingletonpoints'))

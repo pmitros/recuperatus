@@ -25,7 +25,7 @@ of; the result was traced to outlines and cleaned up in FontForge.
 
 - `fonts/recuperatus-mono/RecuperatusMono-Regular.otf` — CFF outlines
 - `fonts/recuperatus-mono/RecuperatusMono-Regular.ttf` — TrueType, hinted with ttfautohint
-- 79 glyphs: Basic Latin letters, digits and the punctuation that appears in
+- 81 glyphs: Basic Latin letters, digits and the punctuation that appears in
   the source. As on many typewriters, the digit `1` and lowercase `l` share a
   shape.
 

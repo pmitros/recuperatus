@@ -19,7 +19,8 @@ from fontTools.svgLib.path import parse_path
 import pathops
 
 FAMILY = os.environ.get('FAMILY', 'Recuperatus Mono')
-MIN_SAMPLES = 10
+MIN_SAMPLES = int(os.environ.get('MIN_SAMPLES', '10'))
+MASTERS = os.environ.get('MASTERS', 'work/masters')
 SKIP = set('[]|_°“”‘’—–')           # hand-built, not real glyphs, or OCR variants of the one quote/dash key
 UP = 4; PITCH_PX = 18 * UP          # master pixels per pitch (matches 03_masters.py)
 U0, V0 = -0.75, -1.55
@@ -67,8 +68,8 @@ def to_font_units(paths, potrace_tf, h):
 
 
 def main():
-    data = np.load('work/masters.npz')
-    stats = json.load(open('work/masters.json'))
+    data = np.load(MASTERS + '.npz')
+    stats = json.load(open(MASTERS + '.json'))
     glyphs = {}
     for key in data.files:
         ch = chr(int(key[1:], 16))
