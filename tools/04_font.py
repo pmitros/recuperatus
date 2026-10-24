@@ -21,7 +21,7 @@ import pathops
 FAMILY = os.environ.get('FAMILY', 'Recuperatus Mono')
 MIN_SAMPLES = int(os.environ.get('MIN_SAMPLES', '10'))
 MASTERS = os.environ.get('MASTERS', 'work/masters')
-SKIP = set('[]|_°“”‘’—–')           # hand-built, not real glyphs, or OCR variants of the one quote/dash key
+SKIP = set('[]|_°“”‘’—–') | set(os.environ.get('EXTRA_SKIP', ''))           # hand-built, not real glyphs, or OCR variants of the one quote/dash key
 UP = 4; PITCH_PX = 18 * UP          # master pixels per pitch (matches 03_masters.py)
 U0, V0 = -0.75, -1.55
 ADV = 600
@@ -29,7 +29,7 @@ S = ADV / PITCH_PX                  # font units per master pixel
 SUPER = 2                           # extra upsampling before thresholding
 
 
-def glyph_bitmap(m):
+def glyph_bitmap(m, n_samples=99):
     big = np.asarray(Image.fromarray(m.astype(np.float32)).resize(
         (m.shape[1] * SUPER, m.shape[0] * SUPER), Image.BICUBIC))
     bw = big > 0.5
@@ -39,7 +39,12 @@ def glyph_bitmap(m):
     # keep components that reach into this glyph's own cell (|u| < 0.42 pitch)
     cx0 = int((-0.42 - U0) * PITCH_PX * SUPER); cx1 = int((0.42 - U0) * PITCH_PX * SUPER)
     keep = set(np.unique(lab[:, cx0:cx1])) - {0}
-    return np.isin(lab, list(keep))
+    out = np.isin(lab, list(keep))
+    if n_samples < 3:
+        # one or two samples don't average away the neighbours' ink: clip to the glyph's own cell
+        out[:, :int((-0.5 - U0) * PITCH_PX * SUPER)] = False
+        out[:, int((0.5 - U0) * PITCH_PX * SUPER):] = False
+    return out
 
 
 def trace(bw):
@@ -76,7 +81,7 @@ def main():
         if ch in SKIP or stats[ch]['total'] < MIN_SAMPLES or not ch.isprintable():
             continue
         m = data[key]
-        paths, tf = trace(glyph_bitmap(m))
+        paths, tf = trace(glyph_bitmap(m, stats[ch]['total']))
         glyphs[ch] = to_font_units(paths, tf, m.shape[0])
 
     names = {ch: (f'uni{ord(ch):04X}' if not ch.isalnum() else ch) for ch in glyphs}

@@ -49,6 +49,12 @@ Set `FAMILY="Recuperatus <Name>"` when building a new face. Pitch and resolution
 constants are tuned for 10 cpi typescript imaged at about 180 ppi; adjust
 `PITCH` in `03_masters.py` for other sources.
 
+For a face with few impressions (a short passage in a second typewriter),
+lower `MIN_SAMPLES` to keep rare glyphs; glyphs built from fewer than three
+impressions are clipped to their own cell so a neighbour's ink isn't traced
+into them. `EXTRA_SKIP` lists characters to leave out (e.g. OCR misreads that
+produced a spurious master).
+
 ## Contributing
 
 New fonts are welcome. A contribution should:

@@ -42,7 +42,7 @@ def page(path):
         rec = dict(box=ln.box, baseline=ln.baseline, pitch=p, phase=ph, coherence=r, chars=[])
         # Per-character boxes from the LSTM drift within long words; word boxes don't.  On a
         # typewriter a word's characters occupy consecutive columns, so place each word as a unit.
-        for wbox, word in ln.words:
+        for wi, (wbox, word) in enumerate(ln.words):
             word = [c for c in word if c.ch.strip()]
             if not word:
                 continue
@@ -51,7 +51,7 @@ def page(path):
             for i, c in enumerate(word):
                 x = (ph + (col0 + i) * p) if p else (c.box[0] + c.box[2]) / 2
                 rec['chars'].append(dict(ch=c.ch, conf=c.conf, box=c.box, col=(col0 + i) if p else None,
-                                         base=float(ln.base_y(x))))
+                                         base=float(ln.base_y(x)), w=wi))   # w: OCR word index (word breaks)
         lines.append(rec)
     json.dump(dict(lines=lines), open(out, 'w'))
     return len(lines)
