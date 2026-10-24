@@ -13,8 +13,17 @@ At present, however, it is one font.
 A monospaced typewriter face (10 characters per inch, 600/1000 em advance)
 recovered from the typescript of *The Reign of ETS: The Corporation That Makes
 Up Minds*, the Ralph Nader report on the Educational Testing Service (Allan
-Nairn and Associates, 1980). The glyphs look very much like IBM's Courier
-typewriter design (Howard Kettler, 1955), or a variant thereof.
+Nairn and Associates, 1980).
+
+We first took it for Courier, but set on a page it is a good deal prettier,
+and it is clearly its own design. The easiest way to tell them apart is to compare
+the `a`, `g`, `&` and `%`. Courier's `g` is open, and its tail curls down on the
+right like handwriting; here the `g` comes down on the left and closes in a loop.
+The `&` is closed, the `%` joins its upper circle to the slash, the `#` has a
+very distinct style, and the `9` has an interesting shape of its own. The
+serifs are clearly shaped rather than Courier's straight slabs. These are
+features of the typeface, not ink spread from averaging many impressions.
+We haven't identified the face; if you know it, please open an issue.
 
 Each glyph was rebuilt statistically rather than drawn: the page images were
 OCR'd, every character was located on the typewriter's fixed-pitch grid, and up
